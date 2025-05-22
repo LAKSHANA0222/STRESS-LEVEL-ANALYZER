@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stress Quiz</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #a1c4fd, #de53b6, #72529e, #416e90);
+      background-size: 400% 400%;
+      animation: gradientMove 18s ease infinite;
+      color: #fff;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    .question {
+      margin: 20px auto;
+      text-align: left;
+      max-width: 700px;
+    }
+    .question p {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    label {
+      display: block;
+      margin: 6px 0;
+    }
+    button {
+      padding: 12px 25px;
+      margin-top: 30px;
+      font-size: 16px;
+      background: #fff;
+      color: #2d0052;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Stress Level Assessment</h1>
+  <form id="quizForm">
+    <div id="questions"></div>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    const questions = [
+      "How often do you feel overwhelmed?",
+      "How well are you sleeping?",
+      "Do you experience body pain?",
+      "Hard to concentrate?",
+      "Feel anxious without reason?",
+      "How do you feel when waking?",
+      "Easily irritated?",
+      "React to small delays?",
+      "Skip meals or eat poorly?",
+      "Feel tired during the day?",
+      "Handle pressure at work/school?",
+      "Feel supported by friends/family?",
+      "Physical symptoms of anxiety?",
+      "Relaxation/hobby time per week?",
+      "Overall stress level past week?"
+    ];
+
+    const options = ["A. Never", "B. Rarely", "C. Sometimes", "D. Often"];
+    const container = document.getElementById("questions");
+
+    questions.forEach((q, idx) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `<p>Q${idx + 1}. ${q}</p>` +
+        options.map((a, i) =>
+          `<label><input type="radio" name="q${idx}" value="${i}" required> ${a}</label>`
+        ).join("");
+      container.appendChild(div);
+    });
+
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      let score = 0;
+      for (let i = 0; i < questions.length; i++) {
+        const val = document.querySelector(`input[name=q${i}]:checked`).value;
+        score += parseInt(val);
+      }
+
+      const name = localStorage.getItem("entry.1681885843");
+      const email = localStorage.getItem("entry.159947109");
+
+      let level = "", tips = "", songs = "";
+
+      if (score <= 15) {
+        level = "🟢 Low Stress (0–15): You're doing great!";
+        tips = `✅ Keep a routine of regular sleep, physical activity, and breaks.<br>
+                ✅ Continue engaging in hobbies and social activities.<br>
+                ✅ Practice gratitude daily.<br>
+                ❌ Don’t ignore small stress signals—prevention is key!`;
+        songs = `"Weightless" – Marconi Union<br>
+                 "Better Together" – Jack Johnson<br>
+                 "Here Comes the Sun" – The Beatles`;
+      } else if (score <= 30) {
+        level = "🟡 Moderate Stress (16–30): You’re doing okay, but could use some relaxation.";
+        tips = `✅ Try 5–10 minutes of deep breathing or meditation.<br>
+                ✅ Take short nature walks or gentle yoga.<br>
+                ✅ Limit screen time before bed.<br>
+                ❌ Don’t rely on caffeine or skip meals.`;
+        songs = `"Let Her Go" – Passenger<br>
+                 "Sunflower" – Post Malone<br>
+                 "Yellow" – Coldplay<br>
+                 "Fix You" – Coldplay`;
+      } else if (score <= 45) {
+        level = "🟠 High Stress (31–45): You need to take control before it gets worse.";
+        tips = `✅ Start journaling your thoughts daily.<br>
+                ✅ Talk to a friend or counselor.<br>
+                ✅ Schedule breaks and avoid multitasking.<br>
+                ❌ Don’t isolate yourself or overwork.`;
+        songs = `"River Flows in You" – Yiruma<br>
+                 "Someone Like You" – Adele<br>
+                 "Ocean Eyes" – Billie Eilish<br>
+                 "Say You Won’t Let Go" – James Arthur`;
+      } else {
+        level = "🔴 Very High Stress (46+): It’s important to prioritize mental health now.";
+        tips = `✅ Seek help from a mental health professional.<br>
+                ✅ Practice grounding techniques.<br>
+                ✅ Consider a digital detox.<br>
+                ❌ Don’t ignore this level of stress—it can impact health.`;
+        songs = `"Weightless" – Marconi Union<br>
+                 "Clair de Lune" – Debussy<br>
+                 "Nocturne in E-flat Major" – Chopin<br>
+                 Lo-fi Chill playlists on YouTube`;
+      }
+
+      // Save results for result.html
+      localStorage.setItem("stressResult", level);
+      localStorage.setItem("stressTips", tips);
+      localStorage.setItem("stressSongs", songs);
+
+      // Send to Google Form (no changes here)
+      const params = new URLSearchParams();
+      params.append("entry.1681885843", name);
+      params.append("entry.159947109", email);
+      params.append("entry.1411718699", level);
+
+      fetch("https://docs.google.com/forms/d/e/1FAIpQLSfVziIwFC6Uco0hebu-DvFSeYoJx5Xi5qhr7HPyAxG2TsxgwA/formResponse", {
+        method: "POST",
+        mode: "no-cors",
+        body: params
+      });
+
+      // Redirect to result page
+      window.location.href = "result.html";
+    });
+  </script>
+</body>
+</html>
